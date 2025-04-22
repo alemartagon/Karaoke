@@ -68,7 +68,8 @@
     let isSettingKeys = false;
 
     function updatePhrase() {
-      textEl.textContent = frasesIta[index];
+      textEl.innerHTML = frasesIta[index].replace(/\\n/g, '<br>');
+
     }
 
     function nextPhrase() {
