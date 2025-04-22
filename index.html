@@ -34,17 +34,8 @@
     <div class="phrase" id="text">Inizia a parlare in spagnolo...</div>
   </div>
 
+  <script src="data.js"></script>
   <script>
-    const frasesEsp = [
-      "Buenos días a todos. Antes de comenzar, quiero agradecer al tribunal su presencia hoy aquí, al igual que agradezco a mis directoras y tutor la ayuda que me han brindado durante el desarrollo de este trabajo.",
-      "Aunque me gustaría hablaros de este proyecto durante horas, debo acogerme al tiempo establecido así que intentaré ser breve, clara y concisa, de forma que todos podáis apreciar el aporte que supone este trabajo independientemente de los conocimientos que tiene cada uno sobre la entonación y sobre los dialectos sicilianos."
-    ];
-
-    const frasesIta = [
-      "Buongiorno a tutti. Prima di cominciare, vorrei ringraziare il tribunale per la sua presenza oggi qui, così come ringrazio le mie direttrici e il mio tutor per l’aiuto che mi hanno offerto durante lo sviluppo di questo lavoro.",
-      "Anche se mi piacerebbe parlarvi di questo progetto per ore, devo rispettare il tempo stabilito, quindi cercherò di essere breve, chiara e concisa, in modo che tutti possiate cogliere il contributo di questo lavoro indipendentemente dalle conoscenze che ciascuno ha sull’intonazione e sui dialetti siciliani."
-    ];
-
     const textEl = document.getElementById("text");
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition, lastMatch = -1;
@@ -70,11 +61,11 @@
       recognition.onerror = (e) => {
         console.error("Speech recognition error:", e);
         recognition.stop();
-        setTimeout(() => recognition.start(), 1000); // restart after delay
+        setTimeout(() => recognition.start(), 1000);
       };
 
       recognition.onend = () => {
-        setTimeout(() => recognition.start(), 500); // keep listening
+        setTimeout(() => recognition.start(), 500);
       };
 
       recognition.start();
@@ -82,4 +73,3 @@
   </script>
 </body>
 </html>
-
