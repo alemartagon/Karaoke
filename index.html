@@ -17,42 +17,55 @@
     }
     .container {
       text-align: center;
-      max-width: 800px;
+      max-width: 90%;
       padding: 2rem;
       background: white;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       border-radius: 1rem;
     }
     .phrase {
-      font-size: 1.5rem;
-      line-height: 2.2rem;
+      font-size: 2.5rem;
+      line-height: 3.3rem;
       margin-bottom: 1.5rem;
     }
     .controls {
       display: flex;
       justify-content: center;
       gap: 1rem;
+      flex-wrap: wrap;
     }
     button {
       padding: 0.75rem 1.5rem;
       font-size: 1rem;
       cursor: pointer;
     }
+    .setup-message {
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="phrase" id="text">Haz clic en los botones para avanzar o retroceder.</div>
+    <div class="phrase" id="text">Pulsa las teclas para configurar navegación.</div>
+    <div class="setup-message" id="setup"></div>
     <div class="controls">
       <button onclick="prevPhrase()">⟵ Anterior</button>
       <button onclick="nextPhrase()">Siguiente ⟶</button>
+      <button onclick="startKeySetup()">⚙️ Cambiar teclas</button>
     </div>
   </div>
 
   <script src="data.js"></script>
   <script>
     const textEl = document.getElementById("text");
+    const setupEl = document.getElementById("setup");
     let index = 0;
+
+    let forwardKeyCode = null;
+    let backwardKeyCode = null;
+    let keySetupStep = 0;
+    let isSettingKeys = false;
 
     function updatePhrase() {
       textEl.textContent = frasesIta[index];
@@ -72,6 +85,37 @@
       }
     }
 
+    function handleKeySetup(e) {
+      if (!isSettingKeys) return;
+      if (keySetupStep === 0) {
+        forwardKeyCode = e.code;
+        setupEl.textContent = `Tecla para avanzar: ${e.key} | Tecla para retroceder: `;
+        keySetupStep = 1;
+      } else if (keySetupStep === 1) {
+        backwardKeyCode = e.code;
+        setupEl.textContent += `${e.key}`;
+        keySetupStep = 2;
+        isSettingKeys = false;
+        document.removeEventListener("keydown", handleKeySetup);
+      }
+    }
+
+    function handleKeyControl(e) {
+      if (e.code === forwardKeyCode) {
+        nextPhrase();
+      } else if (e.code === backwardKeyCode) {
+        prevPhrase();
+      }
+    }
+
+    function startKeySetup() {
+      setupEl.textContent = "Pulsa la tecla que quieres usar para avanzar...";
+      keySetupStep = 0;
+      isSettingKeys = true;
+      document.addEventListener("keydown", handleKeySetup);
+    }
+
+    document.addEventListener("keydown", handleKeyControl);
     updatePhrase();
   </script>
 </body>
