@@ -27,21 +27,14 @@
       line-height: 2.2rem;
       margin-bottom: 1.5rem;
     }
-    button {
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="phrase" id="text">Pulsa el botón y habla en español</div>
-    <button onclick="startRecognition()">Hablar</button>
+    <div class="phrase" id="text">Inizia a parlare in spagnolo...</div>
   </div>
 
   <script>
-    // Frases en español e italiano emparejadas por orden
     const frasesEsp = [
       "Buenos días a todos. Antes de comenzar, quiero agradecer al tribunal su presencia hoy aquí, al igual que agradezco a mis directoras y tutor la ayuda que me han brindado durante el desarrollo de este trabajo.",
       "Aunque me gustaría hablaros de este proyecto durante horas, debo acogerme al tiempo establecido así que intentaré ser breve, clara y concisa, de forma que todos podáis apreciar el aporte que supone este trabajo independientemente de los conocimientos que tiene cada uno sobre la entonación y sobre los dialectos sicilianos."
@@ -52,43 +45,41 @@
       "Anche se mi piacerebbe parlarvi di questo progetto per ore, devo rispettare il tempo stabilito, quindi cercherò di essere breve, chiara e concisa, in modo che tutti possiate cogliere il contributo di questo lavoro indipendentemente dalle conoscenze che ciascuno ha sull’intonazione e sui dialetti siciliani."
     ];
 
-    let recognition;
+    const textEl = document.getElementById("text");
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition, lastMatch = -1;
 
-    function startRecognition() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-      if (!SpeechRecognition) {
-        document.getElementById("text").textContent = "Tu navegador no soporta reconocimiento de voz.";
-        return;
-      }
-
+    if (!SpeechRecognition) {
+      textEl.textContent = "Tu navegador no soporta reconocimiento de voz.";
+    } else {
       recognition = new SpeechRecognition();
       recognition.lang = 'es-ES';
       recognition.interimResults = false;
-      recognition.continuous = false;
+      recognition.continuous = true;
 
       recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.trim().toLowerCase();
-        const matchIndex = frasesEsp.findIndex(f => transcript.includes(f.slice(0, 15).toLowerCase()));
+        const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+        const matchIndex = frasesEsp.findIndex((f, i) => i > lastMatch && transcript.includes(f.slice(0, 15).toLowerCase()));
 
         if (matchIndex !== -1) {
-          document.getElementById("text").textContent = frasesIta[matchIndex];
-        } else {
-          document.getElementById("text").textContent = "No se encontró traducción. Intenta de nuevo.";
+          textEl.textContent = frasesIta[matchIndex];
+          lastMatch = matchIndex;
         }
-
-        recognition.stop();
       };
 
       recognition.onerror = (e) => {
-        console.error(e);
+        console.error("Speech recognition error:", e);
         recognition.stop();
-        document.getElementById("text").textContent = "Error en el reconocimiento de voz. Inténtalo otra vez.";
+        setTimeout(() => recognition.start(), 1000); // restart after delay
       };
 
-      document.getElementById("text").textContent = "Escuchando...";
+      recognition.onend = () => {
+        setTimeout(() => recognition.start(), 500); // keep listening
+      };
+
       recognition.start();
     }
   </script>
 </body>
 </html>
+
