@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Karaoke Italiano Minimalista</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f4f4f4;
+      margin: 0;
+    }
+    .container {
+      text-align: center;
+      max-width: 800px;
+      padding: 2rem;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 1rem;
+    }
+    .phrase {
+      font-size: 1.5rem;
+      line-height: 2.2rem;
+    }
+    button {
+      margin-top: 1.5rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="phrase" id="text">Premi il pulsante per iniziare</div>
+    <button onclick="startRecognition()">Inizia</button>
+  </div>
+
+  <script>
+    const phrases = `Buongiorno a tutti. Prima di cominciare, vorrei ringraziare il tribunale per la sua presenza oggi qui, così come ringrazio le mie direttrici e il mio tutor per l’aiuto che mi hanno offerto durante lo sviluppo di questo lavoro. Anche se mi piacerebbe parlarvi di questo progetto per ore, devo rispettare il tempo stabilito, quindi cercherò di essere breve, chiara e concisa, in modo che tutti possiate cogliere il contributo di questo lavoro indipendentemente dalle conoscenze che ciascuno ha sull’intonazione e sui dialetti siciliani.`.split(/(?<=[.!?])\s+/);
+
+    let current = 0;
+    const textEl = document.getElementById("text");
+
+    function startRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        textEl.textContent = "Il tuo browser non supporta il riconoscimento vocale.";
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'it-IT';
+      recognition.interimResults = false;
+      recognition.continuous = false;
+
+      function nextPhrase() {
+        if (current >= phrases.length) {
+          textEl.textContent = "Hai finito!";
+          return;
+        }
+        textEl.textContent = phrases[current];
+        recognition.start();
+      }
+
+      recognition.onresult = () => {
+        current++;
+        nextPhrase();
+      };
+
+      recognition.onerror = (e) => {
+        console.error(e);
+        recognition.stop();
+        textEl.textContent = "Errore nel riconoscimento vocale. Riprova.";
+      };
+
+      nextPhrase();
+    }
+  </script>
+</body>
+</html>
